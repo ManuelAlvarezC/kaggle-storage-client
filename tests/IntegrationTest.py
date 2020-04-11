@@ -5,7 +5,8 @@ import unittest
 from os import path
 from os.path import exists
 
-import kaggle_storage_client
+
+from kaggle_storage_client.kaggle import KaggleStorageClient, DEFAULT_DATA_DIR
 from tests.support import save_test_config_file, EXAMPLE_DATASET
 
 
@@ -13,29 +14,31 @@ class IntegrationTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        if exists(kaggle_storage_client.DEFAULT_DATA_DIR):
-            shutil.rmtree(kaggle_storage_client.DEFAULT_DATA_DIR, ignore_errors=False, onerror=None)
+        if exists(DEFAULT_DATA_DIR):
+            shutil.rmtree(DEFAULT_DATA_DIR, ignore_errors=False, onerror=None)
         cls.configfile = save_test_config_file()
-        cls.client = kaggle_storage_client.KaggleStorageClient(configfile=cls.configfile)
+        cls.client = KaggleStorageClient(configfile=cls.configfile)
 
     @property
     def local_data_file_1(self):
-        return path.join(f'{self.client.local_storage.root}', EXAMPLE_DATASET['OWNER'], EXAMPLE_DATASET['NAME'],
-                         EXAMPLE_DATASET['FILE_1'])
+        return path.join(
+            f'{self.client.local_storage.root}', EXAMPLE_DATASET['OWNER'],
+            EXAMPLE_DATASET['NAME'], EXAMPLE_DATASET['FILE_1'])
 
     def test_that_the_configfile_exists(self):
         it = self.configfile
         self.assertTrue(exists(it))
 
     def test_that_data_folder_exists_as_empty(self):
-        it = kaggle_storage_client.DEFAULT_DATA_DIR
+        it = DEFAULT_DATA_DIR
         self.assertTrue(exists(it) and len(os.listdir(it)) == 0)
 
     def test_that_save_puts_file_in_local_storage(self):
         if exists(self.local_data_file_1):
             os.remove(self.local_data_file_1)
         self.assertTrue(not exists(self.local_data_file_1))
-        self.client.download(self.client.username, EXAMPLE_DATASET['NAME'], EXAMPLE_DATASET['FILE_1'])
+        self.client.download(
+            self.client.username, EXAMPLE_DATASET['NAME'], EXAMPLE_DATASET['FILE_1'])
         time.sleep(1)
         self.assertTrue(exists(self.local_data_file_1))
 

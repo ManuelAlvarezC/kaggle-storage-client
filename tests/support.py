@@ -17,6 +17,7 @@ EXAMPLE_DATASET = {
     'FILE_2_CONTENT': EXAMPLE_DATASET_FILE_2_CONTENT,
 }
 
+
 def save_test_config_file(configfile_path="kaggle.json", configfile_content="{username:coronawhybeta,key:6d67ed08ee2a272b499665d746184fd0}"):
     with open(configfile_path, "w") as config:
         config.write(configfile_content)
